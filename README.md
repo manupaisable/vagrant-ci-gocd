@@ -31,3 +31,7 @@ VM ubuntu 14.04 LTS
 ### Jenkins
 
 #### Example pipeline
+
+## Troubleshooting
+
+### Port conflicts
