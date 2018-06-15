@@ -10,7 +10,14 @@ Vagrant and Ansible setup to spin up a VM with Jenkins up and running
 
 ## Usage
 
+### Start new VM
+
+copy Vagrantfile
 vagrant up
+
+### Update running VM
+
+vagrant provision
 
 ## Virtual Machine
 
