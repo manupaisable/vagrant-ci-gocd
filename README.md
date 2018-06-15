@@ -1,5 +1,5 @@
 # vagrant-ci-jenkins
-Vagrant setup to spin up a Jenkins VM using Ansible
+Vagrant and Ansible setup to spin up a VM with Jenkins up and running
 
 ## Pre-requisites
 
