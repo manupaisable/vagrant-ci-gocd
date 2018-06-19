@@ -9,6 +9,11 @@
    - libselinux-python
    - libsemanage-python
 
+- name: Install git
+  yum: 
+    name: git
+    state: present
+
 - name: Download GoCD repo
   get_url: 
     url: https://download.gocd.org/gocd.repo 
@@ -20,19 +25,46 @@
     state: directory
     mode: 0755
 
-- name: Install GoCD
+- name: Install GoCD server
   yum: 
     name: go-server
     state: present
 
-- name: Start GoCD
+- name: Start GoCD server
   service: name=go-server state=started enabled=yes
 
 - name: Wait for GoCD to start up 
   shell: "curl -D - --silent --max-time 5 http://localhost:8153/go/"
   register: result
   until: (result.stdout.find("302 Found") != -1)
-  retries: 15
+  retries: 20
   delay: 5
   changed_when: false
   check_mode: no
+
+- name: Add example pipeline to GoCD
+  lineinfile:
+    dest: /etc/go/cruise-config.xml
+    insertbefore: '<agents>'
+    line: '<config-repos> 
+           <config-repo pluginId="json.config.plugin" id="gocd-demo-config-repo-json"> 
+           <git url="https://github.com/arvindsv/gocd-demo-config-repo-json.git" /> 
+           </config-repo>
+           </config-repos>'
+    state: present
+
+- name: Restart GoCD server (stop)
+  service: name=go-server state=stopped enabled=yes
+
+- name: Restart GoCD server (start)
+  service: name=go-server state=started enabled=yes
+
+- name: Wait for example pipeline to be ready
+  shell: "curl -D - --silent --max-time 5 http://localhost:8153/go/admin/pipelines#group-demo"
+  register: result
+  until: (result.stdout.find("200 OK") != -1)
+  retries: 20
+  delay: 5
+  changed_when: false
+  check_mode: no
+

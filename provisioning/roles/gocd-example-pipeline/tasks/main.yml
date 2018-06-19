@@ -1,0 +1,20 @@
+---
+- name: Add example pipeline to GoCD
+  lineinfile:
+    dest: /etc/go/cruise-config.xml
+    insertbefore: '<agents>'
+    line: '<config-repos> 
+           <config-repo pluginId="json.config.plugin" id="gocd-demo-config-repo-json"> 
+           <git url="https://github.com/arvindsv/gocd-demo-config-repo-json.git" /> 
+           </config-repo>
+           </config-repos>'
+    state: present
+
+- name: Wait for example pipeline to be ready
+  shell: "curl -D - --silent --max-time 5 http://localhost:8153/go/admin/pipelines#group-demo"
+  register: result
+  until: (result.stdout.find("200 OK") != -1)
+  retries: 20
+  delay: 5
+  changed_when: false
+  check_mode: no

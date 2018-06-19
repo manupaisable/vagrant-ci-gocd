@@ -6,3 +6,4 @@
   roles: 
     - gocd-server
     - gocd-agent
+    - gocd-example-pipeline

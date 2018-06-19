@@ -24,6 +24,8 @@ vagrant ssh
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
 
+roughly half a minute for GoCD to be up and running
+
 
 ### Update running VM
 
@@ -47,3 +49,9 @@ VM ubuntu 14.04 LTS
 ## Troubleshooting
 
 ### Port conflicts
+
+## ToDo
+
+- security setup
+- scale agents / tune resources
+- granular tests
