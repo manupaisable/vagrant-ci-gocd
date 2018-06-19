@@ -1,5 +1,8 @@
 ---
-- hosts: all
-  
+- name: GoCD
+  hosts: all
+  become: yes
+  become_user: root
   roles: 
-    - gocd-standalone
+    - gocd-server
+    - gocd-agent

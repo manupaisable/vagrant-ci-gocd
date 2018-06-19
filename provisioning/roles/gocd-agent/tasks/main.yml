@@ -1,0 +1,7 @@
+- name: Install GoCD agent
+  yum: 
+    name: go-agent
+    state: present
+
+- name: Start GoCD agent
+  service: name=go-agent state=started enabled=yes

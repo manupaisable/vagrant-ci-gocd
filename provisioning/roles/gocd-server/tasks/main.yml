@@ -8,21 +8,31 @@
    - java-1.8.0-openjdk
    - libselinux-python
    - libsemanage-python
-  sudo: yes
 
 - name: Download GoCD repo
   get_url: 
     url: https://download.gocd.org/gocd.repo 
     dest: /etc/yum.repos.d/gocd.repo
-  sudo: yes
+
+- name: Create directory for GoCD server 
+  file:
+    path: /var/go
+    state: directory
+    mode: 0755
 
 - name: Install GoCD
   yum: 
     name: go-server
     state: present
-  sudo: yes
 
 - name: Start GoCD
   service: name=go-server state=started enabled=yes
-  sudo: yes
 
+- name: Wait for GoCD to start up 
+  shell: "curl -D - --silent --max-time 5 http://localhost:8153/go/"
+  register: result
+  until: (result.stdout.find("302 Found") != -1)
+  retries: 15
+  delay: 5
+  changed_when: false
+  check_mode: no
