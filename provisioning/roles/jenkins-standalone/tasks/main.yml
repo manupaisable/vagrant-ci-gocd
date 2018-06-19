@@ -1,21 +1,48 @@
 ---
-- name: Install Java 8 # Java 9 and above are not supported by Jenkins at the moment (Jun 2018)
+- name: Install Java 8 
   yum: 
     name: "{{ item }}"
     state: present
   with_items:
    - unzip
-   - java-1.7.0-openjdk
+   - java-1.8.0-openjdk
    - libselinux-python
    - libsemanage-python
+  sudo: yes
 
-- name: Download Jenkins from jenkins.io
+- name: Download Jenkins repo from jenkins.io
   get_url: 
-    url: http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip 
-    dest: /opt/jboss-as-7.1.1.Final.zip
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo 
+    dest: /etc/yum.repos.d/jenkins.repo
+  sudo: yes
 
-- name: Copying standalone.xml configuration file
-  template: 
-    src: standalone.xml 
-    dest: /usr/share/jboss-as/standalone/configuration/
-    notify: restart jboss
+- name: Import Jenkins key
+  rpm_key:  
+    state: present
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+  sudo: yes
+
+- name: Install Jenkins
+  yum: 
+    name: jenkins
+    state: present
+  sudo: yes
+
+- name: Get Jenkins initial admin password from file
+  slurp:
+    src: /var/lib/jenkins/secrets/initialAdminPassword
+  register: adminpassword
+  become: true
+  become_user: root
+
+- name: Install plugin
+  jenkins_plugin:
+    name: build-pipeline-plugin
+    url_username: admin
+    url_password: "{{ adminpassword['content'] }}"
+    url: http://localhost:8080
+
+- name: Start Jenkins
+  service: name=jenkins state=started enabled=yes
+  sudo: yes
+

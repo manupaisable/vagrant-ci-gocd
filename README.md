@@ -5,7 +5,7 @@ Vagrant and Ansible setup to spin up a VM with Jenkins up and running
 
 - virtualbox or another provider
 - vagrant
-- ansible
+- ansible (v2.2 or higher, check with "ansible --version")
 - vagrant box Ubuntu 14.04 - vagrant box add ubuntu/trusty64
 
 ## Usage
@@ -15,11 +15,23 @@ Vagrant and Ansible setup to spin up a VM with Jenkins up and running
 copy Vagrantfile
 vagrant up
 
+check Jenkins is running: sudo service jenkins status
+localhost:8080
+
+unlock jenkins
+<image>
+vagrant ssh
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+
+
 ### Update running VM
 
 vagrant provision
 
-## Virtual Machine
+### Tests
+
+## Virtual Machine Environment
 
 ### OS
 
