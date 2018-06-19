@@ -1,5 +1,13 @@
 ---
-- name: Add example pipeline to GoCD
+- name: Check if pipeline config repos already present
+  lineinfile:
+    path: /etc/go/cruise-config.xml
+    line: "  <config-repos>"
+    state: present
+  check_mode: yes
+  register: config_repos
+
+- name: If not, add example pipeline to GoCD
   lineinfile:
     dest: /etc/go/cruise-config.xml
     insertbefore: '<agents>'
@@ -9,6 +17,7 @@
            </config-repo>
            </config-repos>'
     state: present
+  when: (config_repos is changed)
 
 - name: Wait for example pipeline to be ready
   shell: "curl -D - --silent --max-time 5 http://localhost:8153/go/admin/pipeline_group/demo/edit"
