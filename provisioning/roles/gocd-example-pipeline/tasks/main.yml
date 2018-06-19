@@ -11,7 +11,7 @@
     state: present
 
 - name: Wait for example pipeline to be ready
-  shell: "curl -D - --silent --max-time 5 http://localhost:8153/go/admin/pipelines#group-demo"
+  shell: "curl -D - --silent --max-time 5 http://localhost:8153/go/admin/pipeline_group/demo/edit"
   register: result
   until: (result.stdout.find("200 OK") != -1)
   retries: 20

@@ -27,4 +27,13 @@
 - name: Start GoCD agent
   service: name=go-agent state=started enabled=yes
 
-
+- name: Wait for agent to register with server
+  lineinfile:
+    path: /etc/go/cruise-config.xml
+    line: "  <agents>"
+    state: present
+  check_mode: yes
+  register: content
+  until: (content is not changed)
+  retries: 20
+  delay: 5
