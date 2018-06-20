@@ -45,7 +45,7 @@ Note: make sure the new/modified [tasks are idempotent](https://shadow-soft.com/
 
 ### Tests
 
-For the initial setup we are using a single virtual machine created by Vagrant. The Ansible provisioning process installs 3 "roles" on this VM: go-server, go-agent and an example pipeline. 
+For now we are using a single virtual machine created by Vagrant. The Ansible provisioning process installs 3 "roles" on this VM: go-server, go-agent and an example pipeline. 
 
 Each role details a series of tasks to configure the VM. At the end of each role, we test for an expected outcome that informs us that the role was set up correctly:
 
@@ -75,7 +75,7 @@ This demo pipeline can be removed without problem, it is only meant as an exampl
 
 ## Troubleshooting
 
-As mentioned in the "Pre-requisites" section, port conflicts could prevent the forwarding of HTTP requests from the localhost to the virtual machine, should there be another service using port 8153 on localhost.
+As mentioned in the "Pre-requisites" section, port conflicts could prevent the forwarding of HTTP requests from the localhost to the virtual machine, in case the port is closed or there's another service using port 8153 on localhost.
 
 For any other issues, don't hesitate to contact us by email at: me at manuelpais dot net
 
@@ -92,10 +92,13 @@ Some areas that should definitely be looked into before putting this version in 
    By default, GoCD does not require authentication. However, it [supports multiple authorization mechanisms](https://docs.gocd.org/current/configuration/dev_authentication.html) such as LDAP or social providers like Google, GitHub, etc. Role-based access is also supported, and can be useful for example to restrict write access to some activities in a pipeline.
 
 2. <u>add your own application pipelines</u> 
+   
    Either using the "pipeline as code" feature (recommended) or manually creating new pipeline definitions, add pipelines for the actual applications you want to deliver. This will probably require updating the GoCD agent provisioning to install the necessary tools according to your application needs (for example Maven or Gradle for Java builds).
 
 3. <u>scale agents / finetune resources</u>
+   
    As mentioned, the current setup installs both the server and one agent on the same VM. This will work fine for a limited number of builds/pipelines but usage should be monitored over time and resources scaled to support an agent farm sized according to usage needs.
 
 4. <u>add granular infrastructure tests as you scale</u>
+   
    Currently, we are testing that each role has been set up correctly with Ansible by waiting for a given resource to exist. As the infrastructure and number of VMs grows it is recommended to have more fine-grained testing in place, for example using [Serverspec](https://serverspec.org/).
