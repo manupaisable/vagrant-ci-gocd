@@ -6,7 +6,7 @@ Vagrant setup to spin up GoCD (server and one agent) using Ansible
 The host machine needs to have the following installed/set up:
 
 - [Vagrant](https://www.vagrantup.com/downloads.html)
-- A [Vagrant "provider"](https://www.vagrantup.com/docs/providers/) (Vagrant supports [VirtualBox](https://www.virtualbox.org/) and [Hyper-V](https://www.microsoft.com/hyper-v) out-of-the-box, so these are good options)
+- A [Vagrant "provider"](https://www.vagrantup.com/docs/providers/) (we recommend [VirtualBox](https://www.virtualbox.org/) as it works across a large number of OS distributions)
 - A Vagrant box with CentOS 7 - this is done by running "`vagrant box add centos/7`" after installing vagrant
 - [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-the-control-machine) version 2.2 or higher (if not sure, check by running "`ansible --version`" after installing)
 - Port 8153 open - this is the default port for the GoCD web UI (HTTP requests on this port in the localhost get forwarded to the virtual machine created by Vagrant) and while it's not a commonly used port, please make sure it's available for Vagrant
@@ -59,6 +59,20 @@ The created virtual machine runs on a CentOS 7 operating system, and will have J
 
 ## Example pipeline
 
+The current setup makes use of GoCD's "[pipeline as code](https://docs.gocd.org/current/advanced_usage/pipelines_as_code.html)" feature which allows pointing to a given code repository containing pipeline definitions in either json or yaml format. In this case we're telling GoCD to look for pipeline definitions in:
+
+https://github.com/arvindsv/gocd-demo-config-repo-json
+
+After one or two minutes GoCD finds the json pipeline definition files, updates its data and proceeds to execute the first pipeline run without any manual intervention.
+
+Because this is just a demo, the first run should finish successfully after a few seconds:
+
+![GoCD-finished-pipeline](images/GoCD-finished-pipeline.png)
+
+If you are encountering different results, don't hesitate to let us know (see Troubleshooting section below).
+
+This demo pipeline can be removed without problem, it is only meant as an example for those getting started with GoCD.
+
 ## Troubleshooting
 
 As mentioned in the "Pre-requisites" section, port conflicts could prevent the forwarding of HTTP requests from the localhost to the virtual machine, should there be another service using port 8153 on localhost.
@@ -77,9 +91,11 @@ Some areas that should definitely be looked into before putting this version in 
 
    By default, GoCD does not require authentication. However, it [supports multiple authorization mechanisms](https://docs.gocd.org/current/configuration/dev_authentication.html) such as LDAP or social providers like Google, GitHub, etc. Role-based access is also supported, and can be useful for example to restrict write access to some activities in a pipeline.
 
-2. <u>scale agents / finetune resources</u>
+2. <u>add your own application pipelines</u> 
+   Either using the "pipeline as code" feature (recommended) or manually creating new pipeline definitions, add pipelines for the actual applications you want to deliver. This will probably require updating the GoCD agent provisioning to install the necessary tools according to your application needs (for example Maven or Gradle for Java builds).
+
+3. <u>scale agents / finetune resources</u>
    As mentioned, the current setup installs both the server and one agent on the same VM. This will work fine for a limited number of builds/pipelines but usage should be monitored over time and resources scaled to support an agent farm sized according to usage needs.
 
-3. <u>add granular infrastructure tests as you scale</u>
+4. <u>add granular infrastructure tests as you scale</u>
    Currently, we are testing that each role has been set up correctly with Ansible by waiting for a given resource to exist. As the infrastructure and number of VMs grows it is recommended to have more fine-grained testing in place, for example using [Serverspec](https://serverspec.org/).
-
